@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import '../api/api_client.dart';
 
 class ForecastPage extends StatefulWidget {
@@ -60,49 +59,13 @@ class _ForecastPageState extends State<ForecastPage> {
                       ),
                       SizedBox(height: 20),
 
-                      // Line chart
-                      SizedBox(
-                        height: 250,
-                        child: LineChart(
-                          LineChartData(
-                            titlesData: FlTitlesData(
-                              leftTitles: AxisTitles(
-                                sideTitles: SideTitles(showTitles: true),
-                              ),
-                              bottomTitles: AxisTitles(
-                                sideTitles: SideTitles(showTitles: false),
-                              ),
-                            ),
-                            borderData: FlBorderData(show: true),
-                            lineBarsData: [
-                              LineChartBarData(
-                                isCurved: true,
-                                color: Colors.blue,
-                                spots: [
-                                  FlSpot(0, (_forecast!['forecast_voltage'] ?? 0).toDouble()),
-                                  FlSpot(1, (_forecast!['best_voltage_value'] ?? 0).toDouble()),
-                                ],
-                                dotData: FlDotData(show: true),
-                              ),
-                              LineChartBarData(
-                                isCurved: true,
-                                color: Colors.red,
-                                spots: [
-                                  FlSpot(0, (_forecast!['forecast_current'] ?? 0).toDouble()),
-                                  FlSpot(1, (_forecast!['best_current_value'] ?? 0).toDouble()),
-                                ],
-                                dotData: FlDotData(show: true),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 20),
+                      // Text-only forecast data
                       Text("🔋 Voltage: ${_forecast!['forecast_voltage']} V"),
                       Text("⚡ Current: ${_forecast!['forecast_current']} A"),
-                      Text("📈 Best Voltage Month: ${_forecast!['best_voltage_month']} (${_forecast!['best_voltage_value']} V)"),
-                      Text("📉 Best Current Month: ${_forecast!['best_current_month']} (${_forecast!['best_current_value']} A)"),
+                      Text("📈 Best Voltage Month: ${_forecast!['best_voltage_month']} "
+                          "(${_forecast!['best_voltage_value']} V)"),
+                      Text("📉 Best Current Month: ${_forecast!['best_current_month']} "
+                          "(${_forecast!['best_current_value']} A)"),
                     ],
                   ),
                 ),

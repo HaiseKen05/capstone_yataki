@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../api/api_client.dart';
 import 'login_page.dart';
 import 'sensor_data_page.dart';
-import 'forecast_page.dart';
 
 class DashboardPage extends StatefulWidget {
   final String username;
@@ -78,33 +77,25 @@ class _DashboardPageState extends State<DashboardPage> {
                               Text(
                                 "🔮 Forecast (${_forecast!['forecast_date']})",
                                 style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 8),
-                              Text("🔋 Voltage: ${_forecast!['forecast_voltage']} V"),
-                              Text("⚡ Current: ${_forecast!['forecast_current']} A"),
-                              SizedBox(height: 8),
-                              Text(
-                                "📈 Best Voltage: ${_forecast!['best_voltage_month']} (${_forecast!['best_voltage_value']} V)",
-                              ),
-                              Text(
-                                "📉 Best Current: ${_forecast!['best_current_month']} (${_forecast!['best_current_value']} A)",
-                              ),
-                              SizedBox(height: 10),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton(
-                                  child: Text("See More →"),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (_) => ForecastPage()),
-                                    );
-                                  },
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              )
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                  "🔋 Voltage: ${_forecast!['forecast_voltage']} V"),
+                              Text(
+                                  "⚡ Current: ${_forecast!['forecast_current']} A"),
+                              SizedBox(height: 8),
+                              Text(
+                                "📈 Best Voltage: ${_forecast!['best_voltage_month']} "
+                                "(${_forecast!['best_voltage_value']} V)",
+                              ),
+                              Text(
+                                "📉 Best Current: ${_forecast!['best_current_month']} "
+                                "(${_forecast!['best_current_value']} A)",
+                              ),
+                              // 👇 Removed the "See More →" button
                             ],
                           ),
               ),
