@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
       final dio = Dio();
       final response = await dio.post(
         ApiClient.handshakeUrl,
-        data: {"name": "Keith"}, // Temporary placeholder payload
+        data: {"name": ""}, // Temporary placeholder payload
       );
 
       if (response.statusCode == 200) {
