@@ -1,5 +1,3 @@
-// Adding changes to home page soon
-
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import '../api/api_client.dart';
@@ -11,51 +9,114 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String _response = "Press the button to test connection";
+  bool _isLoading = false;
+  String _errorMessage = "";
 
-  Future<void> _testConnection() async {
+  /// Function to test server connection using handshake API
+  Future<void> _checkServerConnection() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = "";
+    });
+
     try {
       final dio = Dio();
       final response = await dio.post(
         ApiClient.handshakeUrl,
-        data: {"name": "Keith"},
+        data: {"name": "Keith"}, // Temporary placeholder payload
       );
 
       if (response.statusCode == 200) {
-        setState(() => _response = response.data["message"]);
+        // ✅ Connection successful → go to LoginPage
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => LoginPage()),
+        );
       } else {
-        setState(() => _response = "❌ Server error: ${response.statusCode}");
+        // ❌ Server responded but with error
+        setState(() {
+          _errorMessage = "Server Offline (Error ${response.statusCode})";
+          _isLoading = false;
+        });
       }
     } catch (e) {
-      setState(() => _response = "⚠️ Connection failed: $e");
+      // ⚠️ Network failure or server unreachable
+      setState(() {
+        _errorMessage = "Server Offline";
+        _isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Home")),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(_response, textAlign: TextAlign.center),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _testConnection,
-              child: Text("Test Connection"),
+      backgroundColor: const Color.fromARGB(255, 8, 8, 8),
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // 🌐 Logo at the top
+                Image.asset(
+                  'assets/images/output.png', // <-- Make sure you have a logo in assets
+                  height: 120,
+                ),
+                SizedBox(height: 30),
+
+                // App title or welcome message
+                Text(
+                  "Welcome to Yataki",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(221, 96, 15, 228),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 10),
+
+                Text(
+                  "Monitor your Generated Power System",
+                  style: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 255, 255, 255)),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 40),
+
+                // 🚀 "Get Started" button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _checkServerConnection,
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 14),
+                      textStyle: TextStyle(fontSize: 18),
+                    ),
+                    child: _isLoading
+                        ? CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          )
+                        : Text("Get Started"),
+                  ),
+                ),
+                SizedBox(height: 20),
+
+                // ❗ Error message if server offline
+                if (_errorMessage.isNotEmpty)
+                  Text(
+                    _errorMessage,
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+              ],
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => LoginPage()),
-                );
-              },
-              child: Text("Go to Login"),
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -48,64 +48,56 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       appBar: AppBar(
         title: Text("Dashboard"),
+        elevation: 0,
         automaticallyImplyLeading: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Welcome, ${widget.username} 👋",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-
-            // 🔮 Forecast Preview
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: _loadingForecast
-                    ? Center(child: CircularProgressIndicator())
-                    : _forecastError.isNotEmpty
-                        ? Text(_forecastError)
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "🔮 Forecast (${_forecast!['forecast_date']})",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                  "🔋 Voltage: ${_forecast!['forecast_voltage']} V"),
-                              Text(
-                                  "⚡ Current: ${_forecast!['forecast_current']} A"),
-                              SizedBox(height: 8),
-                              Text(
-                                "📈 Best Voltage: ${_forecast!['best_voltage_month']} "
-                                "(${_forecast!['best_voltage_value']} V)",
-                              ),
-                              Text(
-                                "📉 Best Current: ${_forecast!['best_current_month']} "
-                                "(${_forecast!['best_current_value']} A)",
-                              ),
-                              // 👇 Removed the "See More →" button
-                            ],
-                          ),
+      body: RefreshIndicator(
+        onRefresh: _fetchForecast,
+        child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 👋 Welcome Section
+              Text(
+                "Welcome, ${widget.username} 👋",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: const Color.fromARGB(221, 248, 248, 248),
+                ),
               ),
-            ),
+              SizedBox(height: 10),
+              Text(
+                "Here's an overview of your system today",
+                style: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 255, 255, 255)),
+              ),
+              SizedBox(height: 20),
 
-            // 📡 Sensor Data
-            Card(
-              child: ListTile(
-                leading: Icon(Icons.sensors),
-                title: Text("View Sensor Data"),
+              // 🔮 Forecast Section
+              _buildForecastCard(),
+
+              SizedBox(height: 20),
+
+              // 📡 Navigation Section
+              Text(
+                "Quick Actions",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: const Color.fromARGB(221, 255, 255, 255),
+                ),
+              ),
+              SizedBox(height: 12),
+
+              _buildQuickAction(
+                icon: Icons.sensors,
+                title: "View Sensor Data",
+                color: Colors.blueAccent,
                 onTap: () {
                   Navigator.push(
                     context,
@@ -113,13 +105,13 @@ class _DashboardPageState extends State<DashboardPage> {
                   );
                 },
               ),
-            ),
 
-            // 🚪 Logout
-            Card(
-              child: ListTile(
-                leading: Icon(Icons.logout),
-                title: Text("Logout"),
+              SizedBox(height: 10),
+
+              _buildQuickAction(
+                icon: Icons.logout,
+                title: "Logout",
+                color: Colors.redAccent,
                 onTap: () {
                   ApiClient.cookieJar.deleteAll();
                   Navigator.pushReplacement(
@@ -128,9 +120,143 @@ class _DashboardPageState extends State<DashboardPage> {
                   );
                 },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  // 🌤 Forecast UI
+  Widget _buildForecastCard() {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: _loadingForecast
+            ? Center(child: CircularProgressIndicator())
+            : _forecastError.isNotEmpty
+                ? Center(
+                    child: Text(
+                      _forecastError,
+                      style: TextStyle(color: Colors.red, fontSize: 16),
+                    ),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.wb_sunny, color: Colors.orange, size: 28),
+                          SizedBox(width: 8),
+                          Text(
+                            "Today's Forecast",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: const Color.fromARGB(221, 255, 255, 255),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        "Date: ${_forecast!['forecast_date']}",
+                        style: TextStyle(fontSize: 14, color: const Color.fromARGB(255, 255, 255, 255)),
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildForecastMetric(
+                            icon: Icons.battery_charging_full,
+                            label: "Voltage",
+                            value: "${_forecast!['forecast_voltage']} V",
+                            color: Colors.blueAccent,
+                          ),
+                          _buildForecastMetric(
+                            icon: Icons.flash_on,
+                            label: "Current",
+                            value: "${_forecast!['forecast_current']} A",
+                            color: Colors.orangeAccent,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12),
+                      Divider(),
+                      SizedBox(height: 8),
+                      Text(
+                        "Monthly Performance",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: const Color.fromARGB(221, 255, 255, 255),
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Best Voltage: ${_forecast!['best_voltage_month']} (${_forecast!['best_voltage_value']} V)",
+                            style: TextStyle(color: const Color.fromARGB(255, 7, 196, 32)),
+                          ),
+                          Text(
+                            "Best Current: ${_forecast!['best_current_month']} (${_forecast!['best_current_value']} A)",
+                            style: TextStyle(color: const Color.fromARGB(255, 7, 196, 32)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+      ),
+    );
+  }
+
+  // 📊 Forecast Metric Widget
+  Widget _buildForecastMetric({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 28),
+        SizedBox(height: 6),
+        Text(label,
+            style: TextStyle(fontSize: 14, color: const Color.fromARGB(255, 252, 252, 252))),
+        SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ⚡ Quick Action Card
+  Widget _buildQuickAction({
+    required IconData icon,
+    required String title,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 2,
+      child: ListTile(
+        leading: Icon(icon, color: color, size: 30),
+        title: Text(
+          title,
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+        trailing: Icon(Icons.arrow_forward_ios, size: 18, color: const Color.fromARGB(255, 255, 255, 255)),
+        onTap: onTap,
       ),
     );
   }

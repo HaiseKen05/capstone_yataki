@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../api/api_client.dart';
-import 'fullscreen_chart_page.dart'; // ⬅️ New page import
+import 'fullscreen_chart_page.dart';
 
 class SensorDataPage extends StatefulWidget {
   @override
@@ -85,7 +85,27 @@ class _SensorDataPageState extends State<SensorDataPage> {
         : _sensorData;
 
     return Scaffold(
-      appBar: AppBar(title: Text("Sensor Data")),
+      appBar: AppBar(
+        title: Text("Sensor Data"),
+        actions: [
+          // 🆕 Fullscreen Chart Button
+          TextButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => FullscreenChartPage(sensorData: _sensorData),
+                ),
+              );
+            },
+            icon: Icon(Icons.fullscreen, color: Colors.white),
+            label: Text(
+              "Fullscreen Chart",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _errorMessage.isNotEmpty
@@ -94,107 +114,45 @@ class _SensorDataPageState extends State<SensorDataPage> {
                   onRefresh: _refreshData,
                   child: ListView(
                     children: [
-                      // 📊 Compact Chart (last 7 entries)
-                      if (_sensorData.isNotEmpty)
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    FullscreenChartPage(sensorData: _sensorData),
-                              ),
-                            );
-                          },
-                          child: Card(
-                            margin: EdgeInsets.all(16),
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: SizedBox(
-                                height: 250,
-                                child: LineChart(
-                                  LineChartData(
-                                    titlesData: FlTitlesData(
-                                      leftTitles: AxisTitles(
-                                        sideTitles: SideTitles(showTitles: true),
-                                      ),
-                                      bottomTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          showTitles: true,
-                                          getTitlesWidget: (value, meta) {
-                                            int index = value.toInt();
-                                            if (index >= 0 &&
-                                                index < recentData.length) {
-                                              final date =
-                                                  recentData[index]['datetime'];
-                                              return Text(
-                                                DateFormat("MM/dd").format(
-                                                    DateTime.parse(date)),
-                                                style: TextStyle(fontSize: 10),
-                                              );
-                                            }
-                                            return SizedBox.shrink();
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    gridData: FlGridData(show: true),
-                                    borderData: FlBorderData(show: true),
-                                    lineBarsData: [
-                                      // 🔋 Voltage
-                                      LineChartBarData(
-                                        spots: recentData
-                                            .asMap()
-                                            .entries
-                                            .map((e) => FlSpot(
-                                                  e.key.toDouble(),
-                                                  (e.value['voltage'] ?? 0)
-                                                      .toDouble(),
-                                                ))
-                                            .toList(),
-                                        isCurved: true,
-                                        color: Colors.blue,
-                                        dotData: FlDotData(show: false),
-                                      ),
-                                      // ⚡ Current
-                                      LineChartBarData(
-                                        spots: recentData
-                                            .asMap()
-                                            .entries
-                                            .map((e) => FlSpot(
-                                                  e.key.toDouble(),
-                                                  (e.value['current'] ?? 0)
-                                                      .toDouble(),
-                                                ))
-                                            .toList(),
-                                        isCurved: true,
-                                        color: Colors.red,
-                                        dotData: FlDotData(show: false),
-                                      ),
-                                      // 👣 Steps
-                                      LineChartBarData(
-                                        spots: recentData
-                                            .asMap()
-                                            .entries
-                                            .map((e) => FlSpot(
-                                                  e.key.toDouble(),
-                                                  (e.value['steps'] ?? 0)
-                                                      .toDouble(),
-                                                ))
-                                            .toList(),
-                                        isCurved: true,
-                                        color: Colors.green,
-                                        dotData: FlDotData(show: false),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+                      if (_sensorData.isNotEmpty) ...[
+                        _buildChartCard(
+                          title: "Voltage Over Time",
+                          color: Colors.red,
+                          data: recentData,
+                          dataKey: "voltage",
+                          unit: "V",
                         ),
+                        _buildChartCard(
+                          title: "Current Over Time",
+                          color: Colors.blue,
+                          data: recentData,
+                          dataKey: "current",
+                          unit: "A",
+                        ),
+                        _buildChartCard(
+                          title: "Steps Over Time",
+                          color: Colors.yellow[700]!,
+                          data: recentData,
+                          dataKey: "steps",
+                          unit: "steps",
+                          isSteps: true,
+                        ),
+                      ],
+
+                      SizedBox(height: 20),
 
                       // 📜 Sensor Data Logs
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          "Sensor Logs",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+
                       ListView.builder(
                         physics: NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
@@ -229,15 +187,31 @@ class _SensorDataPageState extends State<SensorDataPage> {
                           }
 
                           return Card(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 6.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 2,
                             child: ListTile(
-                              leading: Icon(Icons.memory),
-                              title: Text("Log ID: ${sensor['id']}"),
-                              subtitle: Text(
-                                "Steps: ${sensor['steps']} | "
-                                "V: ${sensor['voltage']}V | "
-                                "I: ${sensor['current']}A",
+                              leading: Icon(Icons.analytics, color: Colors.blue),
+                              title: Text(
+                                "Log #${sensor['id']}",
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              trailing: Text(formattedDate),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(height: 4),
+                                  Text("Voltage: ${sensor['voltage']} V"),
+                                  Text("Current: ${sensor['current']} A"),
+                                  Text("Steps: ${sensor['steps']}"),
+                                ],
+                              ),
+                              trailing: Text(
+                                formattedDate,
+                                style: TextStyle(fontSize: 12),
+                              ),
                             ),
                           );
                         },
@@ -245,6 +219,134 @@ class _SensorDataPageState extends State<SensorDataPage> {
                     ],
                   ),
                 ),
+    );
+  }
+
+  /// Builds a single chart card for a given dataset
+  Widget _buildChartCard({
+    required String title,
+    required Color color,
+    required List<dynamic> data,
+    required String dataKey,
+    required String unit,
+    bool isSteps = false,
+  }) {
+    if (data.isEmpty) return SizedBox.shrink();
+
+    // Calculate min and max dynamically
+    double minVal = double.infinity;
+    double maxVal = double.negativeInfinity;
+
+    for (var point in data) {
+      final value = (point[dataKey] ?? 0).toDouble();
+      if (value < minVal) minVal = value;
+      if (value > maxVal) maxVal = value;
+    }
+
+    // Add some padding
+    final range = maxVal - minVal;
+    minVal = (minVal - range * 0.1).clamp(0, double.infinity);
+    maxVal = maxVal + range * 0.1;
+
+    return Card(
+      margin: EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10),
+            SizedBox(
+              height: 200,
+              child: LineChart(
+                LineChartData(
+                  minY: minVal,
+                  maxY: maxVal,
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: range > 0 ? range / 5 : 1,
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            isSteps
+                                ? value.toStringAsFixed(0) // Steps as integers
+                                : value.toStringAsFixed(2), // Voltage/Current
+                            style: TextStyle(fontSize: 10),
+                          );
+                        },
+                      ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: (data.length / 6).floorToDouble(),
+                        getTitlesWidget: (value, meta) {
+                          int index = value.toInt();
+                          if (index >= 0 && index < data.length) {
+                            final date = data[index]['datetime'];
+                            return Text(
+                              DateFormat("MM/dd").format(DateTime.parse(date)),
+                              style: TextStyle(fontSize: 10),
+                            );
+                          }
+                          return SizedBox.shrink();
+                        },
+                      ),
+                    ),
+                  ),
+                  gridData: FlGridData(
+                    show: true,
+                    horizontalInterval: range > 0 ? range / 5 : 1,
+                    getDrawingHorizontalLine: (value) => FlLine(
+                      color: Colors.grey.withOpacity(0.2),
+                      strokeWidth: 1,
+                    ),
+                    getDrawingVerticalLine: (value) => FlLine(
+                      color: Colors.grey.withOpacity(0.2),
+                      strokeWidth: 1,
+                    ),
+                  ),
+                  borderData: FlBorderData(
+                    show: true,
+                    border: Border.all(color: Colors.grey),
+                  ),
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: data
+                          .asMap()
+                          .entries
+                          .map((e) => FlSpot(
+                                e.key.toDouble(),
+                                (e.value[dataKey] ?? 0).toDouble(),
+                              ))
+                          .toList(),
+                      isCurved: true,
+                      color: color,
+                      barWidth: 3,
+                      dotData: FlDotData(show: false),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              "Unit: $unit",
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
