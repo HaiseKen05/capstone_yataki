@@ -8,7 +8,7 @@ class ApiClient {
 
   static final Dio dio = Dio(
     BaseOptions(
-      baseUrl: dotenv.env['BASE_URL'] ?? "http://localhost:5000/api/v1",
+      baseUrl: dotenv.env['BASE_URL'] ?? "http://localhost:5000",
       headers: {"Content-Type": "application/json"},
       connectTimeout: const Duration(seconds: 5),
       receiveTimeout: const Duration(seconds: 5),

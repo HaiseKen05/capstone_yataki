@@ -68,13 +68,13 @@ class _DashboardPageState extends State<DashboardPage> {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(221, 248, 248, 248),
+                  color: Colors.white,
                 ),
               ),
               SizedBox(height: 10),
               Text(
                 "Here's an overview of your system today",
-                style: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 255, 255, 255)),
+                style: TextStyle(fontSize: 16, color: Colors.white70),
               ),
               SizedBox(height: 20),
 
@@ -89,7 +89,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(221, 255, 255, 255),
+                  color: Colors.white,
                 ),
               ),
               SizedBox(height: 12),
@@ -109,7 +109,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
               SizedBox(height: 10),
 
-              // Battery Health (NEW)
+              // Battery Health
               _buildQuickAction(
                 icon: Icons.battery_full,
                 title: "Battery Health",
@@ -172,7 +172,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: const Color.fromARGB(221, 255, 255, 255),
+                              color: Colors.white,
                             ),
                           ),
                         ],
@@ -180,7 +180,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       SizedBox(height: 10),
                       Text(
                         "Date: ${_forecast!['forecast_date']}",
-                        style: TextStyle(fontSize: 14, color: const Color.fromARGB(255, 255, 255, 255)),
+                        style: TextStyle(fontSize: 14, color: Colors.white70),
                       ),
                       SizedBox(height: 10),
                       Row(
@@ -200,37 +200,13 @@ class _DashboardPageState extends State<DashboardPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 12),
-                      Divider(),
-                      SizedBox(height: 8),
-                      Text(
-                        "Monthly Performance",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: const Color.fromARGB(221, 255, 255, 255),
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Best Voltage: ${_forecast!['best_voltage_month']} (${_forecast!['best_voltage_value']} V)",
-                            style: TextStyle(color: const Color.fromARGB(255, 7, 196, 32)),
-                          ),
-                          Text(
-                            "Best Current: ${_forecast!['best_current_month']} (${_forecast!['best_current_value']} A)",
-                            style: TextStyle(color: const Color.fromARGB(255, 7, 196, 32)),
-                          ),
-                        ],
-                      ),
                     ],
                   ),
       ),
     );
   }
 
-  // 📊 Forecast Metric Widget
+  // Forecast Metric Widget
   Widget _buildForecastMetric({
     required IconData icon,
     required String label,
@@ -242,7 +218,7 @@ class _DashboardPageState extends State<DashboardPage> {
         Icon(icon, color: color, size: 28),
         SizedBox(height: 6),
         Text(label,
-            style: TextStyle(fontSize: 14, color: const Color.fromARGB(255, 252, 252, 252))),
+            style: TextStyle(fontSize: 14, color: Colors.white70)),
         SizedBox(height: 4),
         Text(
           value,
@@ -256,7 +232,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // ⚡ Quick Action Card
+  // ⚡ Quick Action Widget
   Widget _buildQuickAction({
     required IconData icon,
     required String title,
@@ -301,25 +277,21 @@ class _BatteryHealthPageState extends State<BatteryHealthPage> {
 
   Future<void> _fetchBatteryData() async {
     try {
-      final response = await ApiClient.dio.get("/api/v1/voltage-reading");
+      final response = await ApiClient.dio.get("/battery-health");
+      
       if (response.statusCode == 200) {
         final data = response.data;
 
-        if (data['data'].isNotEmpty) {
-          // Get the latest voltage value
-          double latestVoltage = data['data'].last.toDouble();
-
-          setState(() {
-            batteryVoltage = latestVoltage;
-            batteryPercentage = _calculateBatteryPercentage(latestVoltage);
-            loading = false;
-          });
-        } else {
-          setState(() {
-            errorMessage = "No battery data available.";
-            loading = false;
-          });
-        }
+        setState(() {
+          batteryVoltage = (data['battery_voltage'] as num).toDouble();
+          batteryPercentage = (data['battery_percentage'] as num).toDouble();
+          loading = false;
+        });
+      } else if (response.statusCode == 404) {
+        setState(() {
+          errorMessage = "No battery data found.";
+          loading = false;
+        });
       } else {
         setState(() {
           errorMessage = "Error: ${response.statusCode}";
@@ -332,16 +304,6 @@ class _BatteryHealthPageState extends State<BatteryHealthPage> {
         loading = false;
       });
     }
-  }
-
-  double _calculateBatteryPercentage(double voltage) {
-    const double minVoltage = 3.0;
-    const double maxVoltage = 4.2;
-
-    if (voltage <= minVoltage) return 0.0;
-    if (voltage >= maxVoltage) return 100.0;
-
-    return ((voltage - minVoltage) / (maxVoltage - minVoltage)) * 100;
   }
 
   @override
