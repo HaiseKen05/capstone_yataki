@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -16,6 +17,7 @@ class _SensorDataPageState extends State<SensorDataPage> {
   int _currentPage = 1;
   bool _isLoadingMore = false;
   bool _hasMore = true;
+  Timer? _refreshTimer; // 🔹 Timer for periodic refresh
 
   Future<void> _fetchSensorData({bool loadMore = false}) async {
     if (loadMore) {
@@ -68,6 +70,18 @@ class _SensorDataPageState extends State<SensorDataPage> {
   void initState() {
     super.initState();
     _fetchSensorData();
+
+    // 🔹 Start periodic refresh every 10 seconds
+    _refreshTimer = Timer.periodic(Duration(seconds: 10), (timer) {
+      _refreshData();
+    });
+  }
+
+  @override
+  void dispose() {
+    // 🔹 Cancel timer when widget is destroyed
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _refreshData() async {
@@ -88,7 +102,6 @@ class _SensorDataPageState extends State<SensorDataPage> {
       appBar: AppBar(
         title: Text("Sensor Data"),
         actions: [
-          // 🆕 Fullscreen Chart Button
           TextButton.icon(
             onPressed: () {
               Navigator.push(
@@ -141,7 +154,6 @@ class _SensorDataPageState extends State<SensorDataPage> {
 
                       SizedBox(height: 20),
 
-                      // 📜 Sensor Data Logs
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
@@ -279,8 +291,8 @@ class _SensorDataPageState extends State<SensorDataPage> {
                         getTitlesWidget: (value, meta) {
                           return Text(
                             isSteps
-                                ? value.toStringAsFixed(0) // Steps as integers
-                                : value.toStringAsFixed(2), // Voltage/Current
+                                ? value.toStringAsFixed(0)
+                                : value.toStringAsFixed(2),
                             style: TextStyle(fontSize: 10),
                           );
                         },
