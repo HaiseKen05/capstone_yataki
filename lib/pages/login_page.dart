@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import '../api/api_client.dart';
 import 'dashboard_page.dart';
 
@@ -28,8 +29,10 @@ class _LoginPageState extends State<LoginPage> {
         },
       );
 
+      debugPrint("📡 Login response: ${response.statusCode} ${response.data}");
+
+      // ✅ Successful login
       if (response.statusCode == 200 && response.data["status"] == "success") {
-        // ✅ Navigate to Dashboard on successful login
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -38,11 +41,46 @@ class _LoginPageState extends State<LoginPage> {
         );
       } else {
         setState(() {
-          _loginResponse = "❌ ${response.data['error'] ?? "Login failed"}";
+          _loginResponse = response.data["message"] ??
+              "An unexpected error occurred. Please try again.";
+        });
+      }
+
+    } on DioException catch (dioError) {
+      debugPrint("❌ Dio error: ${dioError.response?.statusCode} - ${dioError.message}");
+
+      if (dioError.response != null) {
+        final statusCode = dioError.response!.statusCode;
+
+        if (statusCode == 401) {
+          // ❌ Wrong username or password
+          setState(() {
+            _loginResponse = "Wrong username or password. Please try again.";
+          });
+        } else if (statusCode == 500) {
+          // ❌ Server internal error
+          setState(() {
+            _loginResponse = "Server error. Please try again later.";
+          });
+        } else {
+          // ❌ Other HTTP error
+          setState(() {
+            _loginResponse =
+                "Login failed (Error $statusCode). Please try again later.";
+          });
+        }
+      } else {
+        // ❌ Network or server unreachable
+        setState(() {
+          _loginResponse =
+              "Unable to connect to the server. Please check your network.";
         });
       }
     } catch (e) {
-      setState(() => _loginResponse = "⚠️ Connection failed: $e");
+      debugPrint("⚠️ Unexpected error: $e");
+      setState(() {
+        _loginResponse = "An unexpected error occurred. Please try again.";
+      });
     } finally {
       setState(() => _isLoading = false);
     }
@@ -58,78 +96,84 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 60),
+              const SizedBox(height: 60),
 
               // 🌐 App Logo
               Image.asset(
-                'assets/images/output.png', // <-- Make sure this logo exists
+                'assets/images/output.png',
                 height: 100,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Title
-              Text(
+              const Text(
                 "Welcome!",
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(221, 235, 235, 235),
+                  color: Color.fromARGB(221, 235, 235, 235),
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
 
-              Text(
+              const Text(
                 "Log in to continue monitoring your kinetic energy system",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 255, 253, 253)),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color.fromARGB(255, 255, 253, 253),
+                ),
               ),
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
 
               // 📝 Username Input
               TextField(
                 controller: _usernameController,
                 cursorColor: Colors.blueAccent,
-                style: TextStyle(
-                  color: const Color.fromARGB(255, 255, 255, 255), // Make text fully visible
-                  fontSize: 18, // Larger font size
+                style: const TextStyle(
+                  color: Color.fromARGB(255, 255, 255, 255),
+                  fontSize: 18,
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person, color: Colors.blueAccent),
+                  prefixIcon: const Icon(Icons.person, color: Colors.blueAccent),
                   labelText: "Username",
-                  labelStyle: TextStyle(
-                    color: const Color.fromARGB(221, 255, 255, 255),
+                  labelStyle: const TextStyle(
+                    color: Color.fromARGB(221, 255, 255, 255),
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
                   hintText: "Enter your username",
-                  hintStyle: TextStyle(color: const Color.fromARGB(255, 255, 255, 255), fontSize: 15),
+                  hintStyle: const TextStyle(
+                    color: Color.fromARGB(255, 255, 255, 255),
+                    fontSize: 15,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blueAccent, width: 2),
+                    borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // 🔒 Password Input
               TextField(
                 controller: _passwordController,
                 obscureText: true,
                 cursorColor: Colors.blueAccent,
-                style: TextStyle(
-                  color: const Color.fromARGB(255, 255, 254, 254), // Make text fully visible
+                style: const TextStyle(
+                  color: Color.fromARGB(255, 255, 254, 254),
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.lock, color: Colors.blueAccent),
+                  prefixIcon: const Icon(Icons.lock, color: Colors.blueAccent),
                   labelText: "Password",
-                  labelStyle: TextStyle(
-                    color: const Color.fromARGB(221, 255, 255, 255),
+                  labelStyle: const TextStyle(
+                    color: Color.fromARGB(221, 255, 255, 255),
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
@@ -139,12 +183,12 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blueAccent, width: 2),
+                    borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
 
               // 🚀 Login Button
               SizedBox(
@@ -152,37 +196,37 @@ class _LoginPageState extends State<LoginPage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    textStyle: TextStyle(fontSize: 18),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    textStyle: const TextStyle(fontSize: 18),
                     backgroundColor: const Color.fromARGB(197, 80, 24, 170),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                   child: _isLoading
-                      ? CircularProgressIndicator(
+                      ? const CircularProgressIndicator(
                           color: Colors.white,
                           strokeWidth: 2.5,
                         )
-                      : Text("Login", style: TextStyle(color: Colors.white)),
+                      : const Text("Login", style: TextStyle(color: Colors.white)),
                 ),
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // ❗ Error message
               if (_loginResponse.isNotEmpty)
                 Text(
                   _loginResponse,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.red,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
 
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
             ],
           ),
         ),
