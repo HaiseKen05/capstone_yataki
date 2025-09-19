@@ -174,28 +174,28 @@ flutter run
 ```
 
 ## 📖 Usage Guide
-Initial Setup
-Power up the IoT device (e.g., ESP32).
-Ensure the device is connected to Wi-Fi and sending data to the backend.
-Using the Mobile App
-Launch the app on your device.
-Log in using your account credentials.
-View the Dashboard for:
-Real-time data visualization
-Summary statistics
-Navigate to the Forecasting tab to check predictions.
-Check Battery Health to monitor performance.
+-Initial Setup
+-Power up the IoT device (e.g., ESP32).
+-Ensure the device is connected to Wi-Fi and sending data to the backend.
+-Using the Mobile App
+-Launch the app on your device.
+-Log in using your account credentials.
+-View the Dashboard for:
+-Real-time data visualization
+-Summary statistics
+-Navigate to the Forecasting tab to check predictions.
+-Check Battery Health to monitor performance.
 
 ## 🤝 Contributing
 
 We welcome contributions!
 To get started:
 
-Fork the repository.
-Create a feature branch (git checkout -b feature/YourFeature).
-Commit changes (git commit -m 'Add new feature').
-Push to branch (git push origin feature/YourFeature).
-Submit a Pull Request.
+-Fork the repository.
+-Create a feature branch (git checkout -b feature/YourFeature).
+-Commit changes (git commit -m 'Add new feature').
+-Push to branch (git push origin feature/YourFeature).
+-Submit a Pull Request.
 
 ## 📜 License
 
