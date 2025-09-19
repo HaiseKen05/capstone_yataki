@@ -78,12 +78,6 @@ The device communicates with the mobile app via an **API** hosted by the backend
 - Voltage
 - Current
 - Steps
-- **Data Summary Tables**:
-- Totals, averages, minimum, and maximum values.
-- **Advanced Filtering:**
-- Daily, weekly, monthly views.
-- Custom month selection.
-
 ---
 
 ### 📉 Forecasting
@@ -91,20 +85,17 @@ The device communicates with the mobile app via an **API** hosted by the backend
 - Predict next day’s voltage and current.
 - Identify the month with the highest predicted energy usage.
 - Background process to **auto-update predictions daily**.
-
 ---
 
 ### 🔋 Battery Health Monitoring *(Mobile Exclusive Feature)*
 - Real-time tracking of **battery health percentage**.
 - Alerts when battery performance drops below safe thresholds.
 - Extended diagnostic data for long-term battery care.
-
 ---
 
 ### 💻 Web Application Companion
 - For administrative tasks and deeper analytics, check the **Web App repository**:
 [Capstone Yataki Web Application](https://github.com/HaiseKen05/Capstone-TeamYataki)
-
 ---
 
 ## **🛠️ Tech Stack**
