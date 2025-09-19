@@ -146,12 +146,12 @@ git clone https://github.com/HaiseKen05/capstone_yataki.git
 cd capstone_yataki
 ```
 
-### ***2. Install Flutter Dependencies
+### **2. Install Flutter Dependencies
 ```bash
 flutter pub get
 ```
 
-### ***3. Configure Backend URL
+### **3. Configure Backend URL
 - Under .env you should see 
 ```bash
 BASE_URL=http://<<YOUR_SERVER_IP>>:5000/api/v1
@@ -159,7 +159,7 @@ HANDSHAKE_URL=http://<<YOUR_SERVER_IP>>:5000/handshake
 ```
 > Replace <YOUR_SERVER_IP> with the IP address of your Flask backend server.
 
-### ***4. Run the App
+### **4. Run the App
 ```bash
 flutter run
 ```
