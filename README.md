@@ -14,7 +14,6 @@ This mobile app serves as the companion application to the [Capstone Yataki Web 
 - [Tech Stack](#%EF%B8%8F-tech-stack)
 - [Project Structure](#-project-structure)
 - [Installation Guide](#-installation-guide)
-- [API Endpoints](#-api-endpoints)
 - [Usage Guide](#-usage-guide)
 - [Future Improvements](#-future-improvements)
 - [Contributing](#-contributing)
