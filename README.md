@@ -123,16 +123,27 @@ The device communicates with the mobile app via an **API** hosted by the backend
 
 capstone_yataki_mobile/
 |
+
 ├── lib/ # Flutter Source Code
+
 │ ├── screens/ # App screens (Dashboard, Forecast, etc.) 
+
 │ ├── widgets/ # Reusable UI components
+
 │ ├── services/ # API integration logic
+
 │ └── main.dart # Entry point
+
 |
 ├── assets/ # Images, icons, and static files
+
 ├── test/ # Automated tests
+
 ├── README.md # Project documentation 
+
 └── pubspec.yaml # Flutter dependencies
+
+
 ## **⚙️ Installation Guide**
 
 ### **1. Clone the Repository**
