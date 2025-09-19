@@ -157,7 +157,7 @@ flutter pub get
 BASE_URL=http://<<YOUR_SERVER_IP>>:5000/api/v1
 HANDSHAKE_URL=http://<<YOUR_SERVER_IP>>:5000/handshake
 ```
-| Replace <YOUR_SERVER_IP> with the IP address of your Flask backend server.
+> Replace <YOUR_SERVER_IP> with the IP address of your Flask backend server.
 
 ### ***4. Run the App
 ```bash
