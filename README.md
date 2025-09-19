@@ -189,6 +189,10 @@ flutter run
 - Check Battery Health to monitor performance.
   
 ---
+
+## 🚧 Future Improvements
+- Implementing manual server selection for migration
+
 ## 🤝 Contributing
 
 We welcome contributions!
