@@ -11,7 +11,7 @@ class ApiClient {
 
   static const _baseUrlKey = 'custom_base_url';
 
-  static String _currentBaseUrl = "http://localhost:5000/api/v1";
+  static String _currentBaseUrl = "http://<Change this to your local Server IP Address>/api/v1";
 
   /// The handshake URL is automatically derived from the base URL
   static String get handshakeUrl {
