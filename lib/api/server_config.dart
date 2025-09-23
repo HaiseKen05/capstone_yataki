@@ -18,6 +18,6 @@ class ServerConfig {
   // Fallback if no URL is set
   static Future<String> getServerUrlOrDefault() async {
     final url = await getServerUrl();
-    return url ?? 'http://192.168.254.107:5000'; // default
+    return url ?? "http://<<YOUR SERVER'S IP>>:5000"; // default
   }
 }
