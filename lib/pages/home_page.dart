@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_client.dart';
 import 'login_page.dart';
 
@@ -11,6 +12,23 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _isLoading = false;
   String _errorMessage = "";
+  String _currentBaseUrl = "";
+  String _currentHandshakeUrl = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUrls();
+  }
+
+  /// Load saved or default URLs
+  Future<void> _loadCurrentUrls() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _currentBaseUrl = prefs.getString('custom_base_url') ?? ApiClient.dio.options.baseUrl;
+      _currentHandshakeUrl = prefs.getString('custom_handshake_url') ?? ApiClient.handshakeUrl;
+    });
+  }
 
   /// Function to test server connection using handshake API
   Future<void> _checkServerConnection() async {
@@ -33,14 +51,12 @@ class _HomePageState extends State<HomePage> {
           MaterialPageRoute(builder: (_) => LoginPage()),
         );
       } else {
-        // ❌ Server responded but with error
         setState(() {
           _errorMessage = "Server Offline (Error ${response.statusCode})";
           _isLoading = false;
         });
       }
     } catch (e) {
-      // ⚠️ Network failure or server unreachable
       setState(() {
         _errorMessage = "Server Offline";
         _isLoading = false;
@@ -48,10 +64,120 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  /// Show dialog to manually set the server IP
+  void _showServerSettingsDialog() {
+    final baseUrlController = TextEditingController(text: _currentBaseUrl);
+    final handshakeUrlController = TextEditingController(text: _currentHandshakeUrl);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color.fromARGB(255, 30, 30, 30),
+          title: Row(
+            children: [
+              Icon(Icons.settings, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                "Server Settings",
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: baseUrlController,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: "Base URL",
+                    labelStyle: TextStyle(color: Colors.white70),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white38),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.purpleAccent),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextField(
+                  controller: handshakeUrlController,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: "Handshake URL",
+                    labelStyle: TextStyle(color: Colors.white70),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white38),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.purpleAccent),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Cancel", style: TextStyle(color: Colors.white)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple,
+              ),
+              onPressed: () async {
+                final newBaseUrl = baseUrlController.text.trim();
+                final newHandshakeUrl = handshakeUrlController.text.trim();
+
+                if (newBaseUrl.isEmpty || newHandshakeUrl.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Please fill in both fields")),
+                  );
+                  return;
+                }
+
+                await ApiClient.updateServerUrls(
+                  baseUrl: newBaseUrl,
+                  handshakeUrl: newHandshakeUrl,
+                );
+
+                setState(() {
+                  _currentBaseUrl = newBaseUrl;
+                  _currentHandshakeUrl = newHandshakeUrl;
+                });
+
+                Navigator.pop(context);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Server URL updated successfully!")),
+                );
+              },
+              child: Text("Save"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 8, 8, 8),
+      appBar: AppBar(
+        title: Text(""),
+        backgroundColor: Colors.black,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings, color: Colors.white),
+            onPressed: _showServerSettingsDialog,
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -61,12 +187,11 @@ class _HomePageState extends State<HomePage> {
               children: [
                 // 🌐 Logo at the top
                 Image.asset(
-                  'assets/images/output.png', // <-- Make sure you have a logo in assets
+                  'assets/images/output.png',
                   height: 120,
                 ),
                 SizedBox(height: 30),
 
-                // App title or welcome message
                 Text(
                   "Welcome to Yataki",
                   style: TextStyle(
@@ -80,12 +205,11 @@ class _HomePageState extends State<HomePage> {
 
                 Text(
                   "Monitor your Generated Power System",
-                  style: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 255, 255, 255)),
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 40),
 
-                // 🚀 "Get Started" button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -104,7 +228,6 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 20),
 
-                // ❗ Error message if server offline
                 if (_errorMessage.isNotEmpty)
                   Text(
                     _errorMessage,
