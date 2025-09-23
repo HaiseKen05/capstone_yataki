@@ -65,8 +65,7 @@ The device communicates with the mobile app via an **API** hosted by the backend
 ## **🚀 Features**
 
 ### 🧾 Data Management 
-- **Automatic Data Logging** via ESP32 (to replace manual logging soon).
-- Manual log entry (temporary feature for testing and validation).
+- **Automatic Data Logging** via ESP32.
 - Data fields include:
     `Steps`
     `Raw_Voltage`
