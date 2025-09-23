@@ -156,6 +156,10 @@ flutter pub get
 BASE_URL=http://<<YOUR_SERVER_IP>>:5000/api/v1
 HANDSHAKE_URL=http://<<YOUR_SERVER_IP>>:5000/handshake
 ```
+- Under server.config.dart, you should be able to see this as well
+```bash
+return url ?? "http://<<YOUR SERVER'S IP>>:5000"; // default
+```
 > Replace <YOUR_SERVER_IP> with the IP address of your Flask backend server.
 
 ### **4. Run the App**
