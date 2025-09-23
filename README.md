@@ -153,18 +153,16 @@ flutter pub get
 - Under .env you should see 
 ```bash
 BASE_URL=http://<<YOUR_SERVER_IP>>:5000/api/v1
-HANDSHAKE_URL=http://<<YOUR_SERVER_IP>>:5000/handshake
 ```
 - Under server.config.dart, you should be able to see this as well
 ```bash
 return url ?? "http://<<YOUR SERVER'S IP>>:5000"; // default
 ```
-> Replace <YOUR_SERVER_IP> with the IP address of your Flask backend server.
 - Under api_client.dart, you should be able to find this line of code 
 ```bash
 static String _currentBaseUrl = "http://<Change this to your local Server IP Address>/api/v1";
 ```
-> Change it to your server's local IP, if left localhost, the APK will not work it will only return to "Server Offline".
+> Change it every URL you to your server's local IP, if left localhost, the APK will not work it will only return to "Server Offline".
 
 ### **4. Run the App**
 ```bash
