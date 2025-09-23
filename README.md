@@ -162,7 +162,7 @@ return url ?? "http://<<YOUR SERVER'S IP>>:5000"; // default
 ```bash
 static String _currentBaseUrl = "http://<Change this to your local Server IP Address>/api/v1";
 ```
-> Change it every URL you to your server's local IP, if left localhost, the APK will not work it will only return to "Server Offline".
+> Change every URL you see to your server's local IP, if left localhost, the APK will not work it will only return to "Server Offline".
 
 ### **4. Run the App**
 ```bash
