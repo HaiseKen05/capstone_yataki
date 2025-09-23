@@ -13,20 +13,18 @@ class _HomePageState extends State<HomePage> {
   bool _isLoading = false;
   String _errorMessage = "";
   String _currentBaseUrl = "";
-  String _currentHandshakeUrl = "";
 
   @override
   void initState() {
     super.initState();
-    _loadCurrentUrls();
+    _loadCurrentBaseUrl();
   }
 
-  /// Load saved or default URLs
-  Future<void> _loadCurrentUrls() async {
+  /// Load saved or default Base URL
+  Future<void> _loadCurrentBaseUrl() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _currentBaseUrl = prefs.getString('custom_base_url') ?? ApiClient.dio.options.baseUrl;
-      _currentHandshakeUrl = prefs.getString('custom_handshake_url') ?? ApiClient.handshakeUrl;
+      _currentBaseUrl = prefs.getString('custom_base_url') ?? ApiClient.baseUrl;
     });
   }
 
@@ -67,7 +65,6 @@ class _HomePageState extends State<HomePage> {
   /// Show dialog to manually set the server IP
   void _showServerSettingsDialog() {
     final baseUrlController = TextEditingController(text: _currentBaseUrl);
-    final handshakeUrlController = TextEditingController(text: _currentHandshakeUrl);
 
     showDialog(
       context: context,
@@ -84,40 +81,18 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: baseUrlController,
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: "Base URL",
-                    labelStyle: TextStyle(color: Colors.white70),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white38),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.purpleAccent),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                TextField(
-                  controller: handshakeUrlController,
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: "Handshake URL",
-                    labelStyle: TextStyle(color: Colors.white70),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white38),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.purpleAccent),
-                    ),
-                  ),
-                ),
-              ],
+          content: TextField(
+            controller: baseUrlController,
+            style: TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              labelText: "Base URL",
+              labelStyle: TextStyle(color: Colors.white70),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white38),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.purpleAccent),
+              ),
             ),
           ),
           actions: [
@@ -131,23 +106,19 @@ class _HomePageState extends State<HomePage> {
               ),
               onPressed: () async {
                 final newBaseUrl = baseUrlController.text.trim();
-                final newHandshakeUrl = handshakeUrlController.text.trim();
 
-                if (newBaseUrl.isEmpty || newHandshakeUrl.isEmpty) {
+                if (newBaseUrl.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Please fill in both fields")),
+                    SnackBar(content: Text("Please enter a valid Base URL")),
                   );
                   return;
                 }
 
-                await ApiClient.updateServerUrls(
-                  baseUrl: newBaseUrl,
-                  handshakeUrl: newHandshakeUrl,
-                );
+                // Update the APIClient with the new Base URL
+                await ApiClient.updateBaseUrl(newBaseUrl);
 
                 setState(() {
                   _currentBaseUrl = newBaseUrl;
-                  _currentHandshakeUrl = newHandshakeUrl;
                 });
 
                 Navigator.pop(context);
