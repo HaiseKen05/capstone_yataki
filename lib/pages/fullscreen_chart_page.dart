@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 class FullscreenChartPage extends StatefulWidget {
   final List<dynamic> sensorData;
 
-  FullscreenChartPage({required this.sensorData});
+  const FullscreenChartPage({super.key, required this.sensorData});
 
   @override
   _FullscreenChartPageState createState() => _FullscreenChartPageState();
@@ -76,9 +76,7 @@ class _FullscreenChartPageState extends State<FullscreenChartPage> {
     final data = widget.sensorData;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Full History Chart"),
-      ),
+      appBar: AppBar(title: const Text("Full History Chart")),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -100,7 +98,9 @@ class _FullscreenChartPageState extends State<FullscreenChartPage> {
                           if (value >= 100) {
                             return Text(value.toStringAsFixed(0)); // Steps
                           } else {
-                            return Text(value.toStringAsFixed(2)); // Voltage/Current
+                            return Text(
+                              value.toStringAsFixed(2),
+                            ); // Voltage/Current
                           }
                         },
                       ),
@@ -143,10 +143,16 @@ class _FullscreenChartPageState extends State<FullscreenChartPage> {
                   lineBarsData: [
                     // 🔋 Voltage (Red)
                     LineChartBarData(
-                      spots: data.asMap().entries.map((e) => FlSpot(
-                            e.key.toDouble(),
-                            (e.value['voltage'] ?? 0).toDouble(),
-                          )).toList(),
+                      spots: data
+                          .asMap()
+                          .entries
+                          .map(
+                            (e) => FlSpot(
+                              e.key.toDouble(),
+                              (e.value['voltage'] ?? 0).toDouble(),
+                            ),
+                          )
+                          .toList(),
                       isCurved: true,
                       color: Colors.red,
                       barWidth: 3,
@@ -154,10 +160,16 @@ class _FullscreenChartPageState extends State<FullscreenChartPage> {
                     ),
                     // ⚡ Current (Blue)
                     LineChartBarData(
-                      spots: data.asMap().entries.map((e) => FlSpot(
-                            e.key.toDouble(),
-                            (e.value['current'] ?? 0).toDouble(),
-                          )).toList(),
+                      spots: data
+                          .asMap()
+                          .entries
+                          .map(
+                            (e) => FlSpot(
+                              e.key.toDouble(),
+                              (e.value['current'] ?? 0).toDouble(),
+                            ),
+                          )
+                          .toList(),
                       isCurved: true,
                       color: Colors.blue,
                       barWidth: 3,
@@ -165,10 +177,16 @@ class _FullscreenChartPageState extends State<FullscreenChartPage> {
                     ),
                     // 👣 Steps (Yellow)
                     LineChartBarData(
-                      spots: data.asMap().entries.map((e) => FlSpot(
-                            e.key.toDouble(),
-                            (e.value['steps'] ?? 0).toDouble(),
-                          )).toList(),
+                      spots: data
+                          .asMap()
+                          .entries
+                          .map(
+                            (e) => FlSpot(
+                              e.key.toDouble(),
+                              (e.value['steps'] ?? 0).toDouble(),
+                            ),
+                          )
+                          .toList(),
                       isCurved: true,
                       color: Colors.yellow[700]!,
                       barWidth: 3,

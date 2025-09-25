@@ -4,6 +4,8 @@ import '../api/api_client.dart';
 import 'dashboard_page.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -41,13 +43,15 @@ class _LoginPageState extends State<LoginPage> {
         );
       } else {
         setState(() {
-          _loginResponse = response.data["message"] ??
+          _loginResponse =
+              response.data["message"] ??
               "An unexpected error occurred. Please try again.";
         });
       }
-
     } on DioException catch (dioError) {
-      debugPrint("❌ Dio error: ${dioError.response?.statusCode} - ${dioError.message}");
+      debugPrint(
+        "❌ Dio error: ${dioError.response?.statusCode} - ${dioError.message}",
+      );
 
       if (dioError.response != null) {
         final statusCode = dioError.response!.statusCode;
@@ -99,10 +103,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 60),
 
               // 🌐 App Logo
-              Image.asset(
-                'assets/images/output.png',
-                height: 100,
-              ),
+              Image.asset('assets/images/output.png', height: 100),
               const SizedBox(height: 20),
 
               // Title
@@ -136,7 +137,10 @@ class _LoginPageState extends State<LoginPage> {
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.person, color: Colors.blueAccent),
+                  prefixIcon: const Icon(
+                    Icons.person,
+                    color: Colors.blueAccent,
+                  ),
                   labelText: "Username",
                   labelStyle: const TextStyle(
                     color: Color.fromARGB(221, 255, 255, 255),
@@ -152,7 +156,10 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
+                    borderSide: const BorderSide(
+                      color: Colors.blueAccent,
+                      width: 2,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
@@ -183,7 +190,10 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
+                    borderSide: const BorderSide(
+                      color: Colors.blueAccent,
+                      width: 2,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
@@ -208,7 +218,10 @@ class _LoginPageState extends State<LoginPage> {
                           color: Colors.white,
                           strokeWidth: 2.5,
                         )
-                      : const Text("Login", style: TextStyle(color: Colors.white)),
+                      : const Text(
+                          "Login",
+                          style: TextStyle(color: Colors.white),
+                        ),
                 ),
               ),
 

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../api/api_client.dart';
 
 class ForecastPage extends StatefulWidget {
+  const ForecastPage({super.key});
+
   @override
   _ForecastPageState createState() => _ForecastPageState();
 }
@@ -47,28 +49,32 @@ class _ForecastPageState extends State<ForecastPage> {
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _errorMessage.isNotEmpty
-              ? Center(child: Text(_errorMessage))
-              : Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Forecast for ${_forecast!['forecast_date']}",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 20),
-
-                      // Text-only forecast data
-                      Text("🔋 Voltage: ${_forecast!['forecast_voltage']} V"),
-                      Text("⚡ Current: ${_forecast!['forecast_current']} A"),
-                      Text("📈 Best Voltage Month: ${_forecast!['best_voltage_month']} "
-                          "(${_forecast!['best_voltage_value']} V)"),
-                      Text("📉 Best Current Month: ${_forecast!['best_current_month']} "
-                          "(${_forecast!['best_current_value']} A)"),
-                    ],
+          ? Center(child: Text(_errorMessage))
+          : Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Forecast for ${_forecast!['forecast_date']}",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                ),
+                  SizedBox(height: 20),
+
+                  // Text-only forecast data
+                  Text("🔋 Voltage: ${_forecast!['forecast_voltage']} V"),
+                  Text("⚡ Current: ${_forecast!['forecast_current']} A"),
+                  Text(
+                    "📈 Best Voltage Month: ${_forecast!['best_voltage_month']} "
+                    "(${_forecast!['best_voltage_value']} V)",
+                  ),
+                  Text(
+                    "📉 Best Current Month: ${_forecast!['best_current_month']} "
+                    "(${_forecast!['best_current_value']} A)",
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }

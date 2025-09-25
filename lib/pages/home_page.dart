@@ -5,6 +5,8 @@ import '../api/api_client.dart';
 import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -75,10 +77,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Icon(Icons.settings, color: Colors.white),
               SizedBox(width: 10),
-              Text(
-                "Server Settings",
-                style: TextStyle(color: Colors.white),
-              ),
+              Text("Server Settings", style: TextStyle(color: Colors.white)),
             ],
           ),
           content: TextField(
@@ -101,9 +100,7 @@ class _HomePageState extends State<HomePage> {
               child: Text("Cancel", style: TextStyle(color: Colors.white)),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
               onPressed: () async {
                 final newBaseUrl = baseUrlController.text.trim();
 
@@ -157,10 +154,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // 🌐 Logo at the top
-                Image.asset(
-                  'assets/images/output.png',
-                  height: 120,
-                ),
+                Image.asset('assets/images/output.png', height: 120),
                 SizedBox(height: 30),
 
                 Text(

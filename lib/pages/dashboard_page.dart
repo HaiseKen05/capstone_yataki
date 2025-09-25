@@ -6,7 +6,7 @@ import 'sensor_data_page.dart';
 class DashboardPage extends StatefulWidget {
   final String username;
 
-  DashboardPage({required this.username});
+  const DashboardPage({super.key, required this.username});
 
   @override
   _DashboardPageState createState() => _DashboardPageState();
@@ -154,54 +154,54 @@ class _DashboardPageState extends State<DashboardPage> {
         child: _loadingForecast
             ? Center(child: CircularProgressIndicator())
             : _forecastError.isNotEmpty
-                ? Center(
-                    child: Text(
-                      _forecastError,
-                      style: TextStyle(color: Colors.red, fontSize: 16),
-                    ),
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            ? Center(
+                child: Text(
+                  _forecastError,
+                  style: TextStyle(color: Colors.red, fontSize: 16),
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Icon(Icons.wb_sunny, color: Colors.orange, size: 28),
-                          SizedBox(width: 8),
-                          Text(
-                            "Today's Forecast",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
+                      Icon(Icons.wb_sunny, color: Colors.orange, size: 28),
+                      SizedBox(width: 8),
                       Text(
-                        "Date: ${_forecast!['forecast_date']}",
-                        style: TextStyle(fontSize: 14, color: Colors.white70),
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildForecastMetric(
-                            icon: Icons.battery_charging_full,
-                            label: "Voltage",
-                            value: "${_forecast!['forecast_voltage']} V",
-                            color: Colors.blueAccent,
-                          ),
-                          _buildForecastMetric(
-                            icon: Icons.flash_on,
-                            label: "Current",
-                            value: "${_forecast!['forecast_current']} A",
-                            color: Colors.orangeAccent,
-                          ),
-                        ],
+                        "Today's Forecast",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   ),
+                  SizedBox(height: 10),
+                  Text(
+                    "Date: ${_forecast!['forecast_date']}",
+                    style: TextStyle(fontSize: 14, color: Colors.white70),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildForecastMetric(
+                        icon: Icons.battery_charging_full,
+                        label: "Voltage",
+                        value: "${_forecast!['forecast_voltage']} V",
+                        color: Colors.blueAccent,
+                      ),
+                      _buildForecastMetric(
+                        icon: Icons.flash_on,
+                        label: "Current",
+                        value: "${_forecast!['forecast_current']} A",
+                        color: Colors.orangeAccent,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -217,8 +217,7 @@ class _DashboardPageState extends State<DashboardPage> {
       children: [
         Icon(icon, color: color, size: 28),
         SizedBox(height: 6),
-        Text(label,
-            style: TextStyle(fontSize: 14, color: Colors.white70)),
+        Text(label, style: TextStyle(fontSize: 14, color: Colors.white70)),
         SizedBox(height: 4),
         Text(
           value,
@@ -246,7 +245,11 @@ class _DashboardPageState extends State<DashboardPage> {
         leading: Icon(icon, color: color, size: 30),
         title: Text(
           title,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+          ),
         ),
         trailing: Icon(Icons.arrow_forward_ios, size: 18, color: Colors.white),
         onTap: onTap,
@@ -259,6 +262,8 @@ class _DashboardPageState extends State<DashboardPage> {
 // Battery Health Page
 // =========================
 class BatteryHealthPage extends StatefulWidget {
+  const BatteryHealthPage({super.key});
+
   @override
   _BatteryHealthPageState createState() => _BatteryHealthPageState();
 }
@@ -278,7 +283,7 @@ class _BatteryHealthPageState extends State<BatteryHealthPage> {
   Future<void> _fetchBatteryData() async {
     try {
       final response = await ApiClient.dio.get("/battery-health");
-      
+
       if (response.statusCode == 200) {
         final data = response.data;
 
@@ -309,41 +314,41 @@ class _BatteryHealthPageState extends State<BatteryHealthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Battery Health"),
-      ),
+      appBar: AppBar(title: Text("Battery Health")),
       body: loading
           ? Center(child: CircularProgressIndicator())
           : errorMessage.isNotEmpty
-              ? Center(child: Text(errorMessage, style: TextStyle(color: Colors.red)))
-              : Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        _getBatteryIcon(batteryPercentage),
-                        color: _getBatteryColor(batteryPercentage),
-                        size: 120,
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        "Voltage: ${batteryVoltage?.toStringAsFixed(2)} V",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        "Battery Health: ${batteryPercentage.toStringAsFixed(1)}%",
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      SizedBox(height: 30),
-                      ElevatedButton.icon(
-                        onPressed: _fetchBatteryData,
-                        icon: Icon(Icons.refresh),
-                        label: Text("Refresh"),
-                      ),
-                    ],
+          ? Center(
+              child: Text(errorMessage, style: TextStyle(color: Colors.red)),
+            )
+          : Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    _getBatteryIcon(batteryPercentage),
+                    color: _getBatteryColor(batteryPercentage),
+                    size: 120,
                   ),
-                ),
+                  SizedBox(height: 20),
+                  Text(
+                    "Voltage: ${batteryVoltage?.toStringAsFixed(2)} V",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "Battery Health: ${batteryPercentage.toStringAsFixed(1)}%",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  SizedBox(height: 30),
+                  ElevatedButton.icon(
+                    onPressed: _fetchBatteryData,
+                    icon: Icon(Icons.refresh),
+                    label: Text("Refresh"),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 

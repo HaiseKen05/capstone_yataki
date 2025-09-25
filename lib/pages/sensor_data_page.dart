@@ -6,6 +6,8 @@ import '../api/api_client.dart';
 import 'fullscreen_chart_page.dart';
 
 class SensorDataPage extends StatefulWidget {
+  const SensorDataPage({super.key});
+
   @override
   _SensorDataPageState createState() => _SensorDataPageState();
 }
@@ -122,115 +124,118 @@ class _SensorDataPageState extends State<SensorDataPage> {
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _errorMessage.isNotEmpty
-              ? Center(child: Text(_errorMessage))
-              : RefreshIndicator(
-                  onRefresh: _refreshData,
-                  child: ListView(
-                    children: [
-                      if (_sensorData.isNotEmpty) ...[
-                        _buildChartCard(
-                          title: "Voltage Over Time",
-                          color: Colors.red,
-                          data: recentData,
-                          dataKey: "voltage",
-                          unit: "V",
-                        ),
-                        _buildChartCard(
-                          title: "Current Over Time",
-                          color: Colors.blue,
-                          data: recentData,
-                          dataKey: "current",
-                          unit: "A",
-                        ),
-                        _buildChartCard(
-                          title: "Steps Over Time",
-                          color: Colors.yellow[700]!,
-                          data: recentData,
-                          dataKey: "steps",
-                          unit: "steps",
-                          isSteps: true,
-                        ),
-                      ],
+          ? Center(child: Text(_errorMessage))
+          : RefreshIndicator(
+              onRefresh: _refreshData,
+              child: ListView(
+                children: [
+                  if (_sensorData.isNotEmpty) ...[
+                    _buildChartCard(
+                      title: "Voltage Over Time",
+                      color: Colors.red,
+                      data: recentData,
+                      dataKey: "voltage",
+                      unit: "V",
+                    ),
+                    _buildChartCard(
+                      title: "Current Over Time",
+                      color: Colors.blue,
+                      data: recentData,
+                      dataKey: "current",
+                      unit: "A",
+                    ),
+                    _buildChartCard(
+                      title: "Steps Over Time",
+                      color: Colors.yellow[700]!,
+                      data: recentData,
+                      dataKey: "steps",
+                      unit: "steps",
+                      isSteps: true,
+                    ),
+                  ],
 
-                      SizedBox(height: 20),
+                  SizedBox(height: 20),
 
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          "Sensor Logs",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      "Sensor Logs",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                  ),
 
-                      ListView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: _sensorData.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index == _sensorData.length) {
-                            if (_isLoadingMore) {
-                              return Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
-                            } else if (_hasMore) {
-                              return TextButton(
-                                onPressed: () {
-                                  setState(() => _currentPage++);
-                                  _fetchSensorData(loadMore: true);
-                                },
-                                child: Text("Load More"),
-                              );
-                            } else {
-                              return SizedBox.shrink();
-                            }
-                          }
-
-                          final sensor = _sensorData[index];
-                          String formattedDate = "";
-                          if (sensor['datetime'] != null) {
-                            formattedDate = DateFormat("yyyy-MM-dd HH:mm")
-                                .format(DateTime.parse(sensor['datetime']));
-                          }
-
-                          return Card(
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 6.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            elevation: 2,
-                            child: ListTile(
-                              leading: Icon(Icons.analytics, color: Colors.blue),
-                              title: Text(
-                                "Log #${sensor['id']}",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(height: 4),
-                                  Text("Voltage: ${sensor['voltage']} V"),
-                                  Text("Current: ${sensor['current']} A"),
-                                  Text("Steps: ${sensor['steps']}"),
-                                ],
-                              ),
-                              trailing: Text(
-                                formattedDate,
-                                style: TextStyle(fontSize: 12),
-                              ),
+                  ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: _sensorData.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == _sensorData.length) {
+                        if (_isLoadingMore) {
+                          return Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: CircularProgressIndicator(),
                             ),
                           );
-                        },
-                      ),
-                    ],
+                        } else if (_hasMore) {
+                          return TextButton(
+                            onPressed: () {
+                              setState(() => _currentPage++);
+                              _fetchSensorData(loadMore: true);
+                            },
+                            child: Text("Load More"),
+                          );
+                        } else {
+                          return SizedBox.shrink();
+                        }
+                      }
+
+                      final sensor = _sensorData[index];
+                      String formattedDate = "";
+                      if (sensor['datetime'] != null) {
+                        formattedDate = DateFormat(
+                          "yyyy-MM-dd HH:mm",
+                        ).format(DateTime.parse(sensor['datetime']));
+                      }
+
+                      return Card(
+                        margin: EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 6.0,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 2,
+                        child: ListTile(
+                          leading: Icon(Icons.analytics, color: Colors.blue),
+                          title: Text(
+                            "Log #${sensor['id']}",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 4),
+                              Text("Voltage: ${sensor['voltage']} V"),
+                              Text("Current: ${sensor['current']} A"),
+                              Text("Steps: ${sensor['steps']}"),
+                            ],
+                          ),
+                          trailing: Text(
+                            formattedDate,
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                ),
+                ],
+              ),
+            ),
     );
   }
 
@@ -271,10 +276,7 @@ class _SensorDataPageState extends State<SensorDataPage> {
           children: [
             Text(
               title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
             SizedBox(
@@ -337,10 +339,12 @@ class _SensorDataPageState extends State<SensorDataPage> {
                       spots: data
                           .asMap()
                           .entries
-                          .map((e) => FlSpot(
-                                e.key.toDouble(),
-                                (e.value[dataKey] ?? 0).toDouble(),
-                              ))
+                          .map(
+                            (e) => FlSpot(
+                              e.key.toDouble(),
+                              (e.value[dataKey] ?? 0).toDouble(),
+                            ),
+                          )
                           .toList(),
                       isCurved: true,
                       color: color,

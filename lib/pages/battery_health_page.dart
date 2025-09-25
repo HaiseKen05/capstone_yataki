@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../api/api_client.dart';
 
 class BatteryHealthPage extends StatefulWidget {
+  const BatteryHealthPage({super.key});
+
   @override
   _BatteryHealthPageState createState() => _BatteryHealthPageState();
 }
@@ -39,7 +41,8 @@ class _BatteryHealthPageState extends State<BatteryHealthPage> {
             data.containsKey('battery_percentage')) {
           setState(() {
             batteryVoltage = (data['battery_voltage'] as num?)?.toDouble();
-            batteryPercentage = (data['battery_percentage'] as num?)?.toDouble();
+            batteryPercentage = (data['battery_percentage'] as num?)
+                ?.toDouble();
             lastUpdated = data['datetime'] as String?;
             loading = false;
           });
@@ -71,14 +74,12 @@ class _BatteryHealthPageState extends State<BatteryHealthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Battery Health"),
-      ),
+      appBar: AppBar(title: const Text("Battery Health")),
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : errorMessage.isNotEmpty
-              ? _buildErrorView()
-              : _buildBatteryHealthView(),
+          ? _buildErrorView()
+          : _buildBatteryHealthView(),
     );
   }
 
